@@ -1,20 +1,27 @@
 # Databricks notebook source
 from pyspark.sql import functions as f
 from pyspark.sql.window import Window
+import sys
+from ConfigParser import ConfigParser
+config = ConfigParser()
 
 sc = spark.sparkContext
 fs = (sc._jvm.org.apache.hadoop.fs.FileSystem.get(sc._jsc.hadoopConfiguration()))
 
-Primary_person_df = spark.read.format('com.databricks.spark.csv').option("inferSchema", "true").options(header='true').option("delimiter", ",").load("dbfs:/mnt/rs06ue2dipadl03/BCG/Primary_Person_use.csv")
+config.read(Path) ##### Provide the config Path
+sysName = sys.argv[1]
 
-Units_df = spark.read.format('com.databricks.spark.csv').option("inferSchema", "true").options(header='true').option("delimiter", ",").load("dbfs:/mnt/rs06ue2dipadl03/BCG/Units_use.csv")
-
-damaged_df = spark.read.format('com.databricks.spark.csv').option("inferSchema", "true").options(header='true').option("delimiter", ",").load("dbfs:/mnt/rs06ue2dipadl03/BCG/Damages_use.csv")
+Primary_person_df = config.get(sysName, 'SOURCE_FILE1')
+Units_df = config.get(sysName, 'SOURCE_FILE2')
+damaged_df = config.get(sysName, 'SOURCE_FILE3')
 
 ##### Analytics1 #############
 
 NoOfCrashes_df = Primary_person_df.filter("PRSN_GNDR_ID = 'MALE'").selectExpr("count(CRASH_ID)")
 NoOfCrashes_df.show()
+
+##### Analytics 2 ################
+###### couldn’t find any field giving 2 wheeler related information
 
 # COMMAND ----------
 
